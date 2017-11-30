@@ -1,7 +1,6 @@
-//------------------------------------------------//
-//          Trabalho feito por Higor H. Alves     //
-//              Data  22/06/2016                  //
-//------------------------------------------------//
+//NOME: LUCAS EDUARDO SILVEIRA COSTA Nº:2017023692
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -160,9 +159,9 @@ int main(int argc, char **argv){
   }
   //FOR SIMPLESMENTE PARA FAZER A IMPRESSÃO DOS DADOS
 	for (i = 0; i < TAM; i++){
-			if (ht[i].repeticao >= 2){
-        printf ("%d ", ht[i].repeticao);
-				printf ("%s\n", ht[i].word);
+			if (ht[i].repeticao >= 1){
+				printf ("%s ", ht[i].word);
+                printf ("%d\n", ht[i].repeticao);
 			}
 		}
   //LIMPA A VARIAVEL WORD
