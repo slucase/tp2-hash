@@ -33,7 +33,7 @@ unsigned int hashFunction(const char* str, unsigned int len){
 int main(int argc, char **argv){
   //DECLARAÇÃO DAS VARIAVEIS A SEREM USADAS
   char *word, unsort_vec[5000][45];  //CORRIGIR ESSA PORRA
-  int i = 0, flag, max, hash = 0, aux = 0, j = 0 /*indice unsort_vec*/, cont_abs = 0;
+  int i = 0, flag,max,hash = 0, aux = 0, j = 0;
   hashTable ht[TAM], htaux[TAM];
 
   //ABERTURA DO ARQUIVO TXT
@@ -65,17 +65,12 @@ int main(int argc, char **argv){
     if(strlen(word) > 1){
       //PASSANDO TUDO PARA LOWER CASE
       for(i = 0; word[i]; i++) word[i] = tolower(word[i]);
+   
       //VETOR ---UNSORTED---
       strcpy(unsort_vec[j++], word);
-      cont_abs ++;
-    }
-   }
-  for (i = 0; i < cont_abs; i++){
+
       //CHAMANDO A FUNÇÃO PARA GERAR A HASH, MANDANDO OS ARGUMENTOS NECESSARIOS E RECEBENDO
       //O RETORNO NA VARIAVEL HASH
-      
-      strcpy(word, unsort_vec[j++]);
-     
       hash = hashFunction(word, strlen(word));
       
       //AUX: VARIAVEL AUXILIAR PARA NOS AJUDAR MAIS TARDE NO PROGRAMA
@@ -143,7 +138,7 @@ int main(int argc, char **argv){
         ht[hash].key ++;
       }
     }
-  
+  }
   //METODO DE ORDENAÇÃO
   //Usando o método SELECTIONSORT, e partindo do principio que a HASH indica a posição de armazenamento do contador
   //e de cada	palavra, é necessário que ambos sejam ordenados "juntos", para isso é usada uma variavel auxliar auxC e um vetor aux
@@ -200,4 +195,4 @@ int main(int argc, char **argv){
   //FECHA O ARQUIVO
   fclose (IN);
   return EXIT_SUCCESS;
- }
+}
