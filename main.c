@@ -32,9 +32,9 @@ unsigned int hashFunction(const char* str, unsigned int len){
 
 int main(int argc, char **argv){
   //DECLARAÇÃO DAS VARIAVEIS A SEREM USADAS
-  char *word, unsort_vec[5000][45];  //CORRIGIR ESSA PORRA
+  char *word;  //CORRIGIR ESSA PORRA
   int i = 0, flag,max,hash = 0, aux = 0, j = 0,h=0, cont_abs=0;
-  hashTable ht[TAM], htaux[TAM];
+  hashTable ht[TAM], htaux[TAM], unsort_vec[5000] ;
 
   //ABERTURA DO ARQUIVO TXT
   FILE *IN;
@@ -52,13 +52,20 @@ int main(int argc, char **argv){
     ht[i].key = 0;
   }
 
+  for (i = 0; i < 5000; i++){
+    unsort_vec[i].repeticao = 0;
+    unsort_vec[i].key = 0;
+  }
+
   //POR CUIDADOS VAMOS ZERAR O BUFFER TAMBEM
   fflush(stdout);
 
   //LENDO O ARQUIVO VAMOS USAR O DELIMITER (UM DEFINE CRIADO COM OS CARACTERES QUE EU NÃO QUERO),
   //COM ELE É POSSIVEL PEGAR UMA PALAVRA POR VEZ EFETUAR AS OPERAÇÕES SEPARADAMENTE EM CADA UMA,
   //MAIS ABAIXO TERA A EXPLICAÇÃO DE CADA FUNÇÃO
-  
+ 
+
+ /*Default ----------------------------------------------------------------
   while ((fscanf (IN, "%m[^"DELIMITER"]%*["DELIMITER"]", &word)) != EOF){
     //VAMOS IGNORAR PALAVRAS COM SOMENTE UMA LETRA
     if(strlen(word) > 1){
@@ -68,8 +75,32 @@ int main(int argc, char **argv){
       strcpy(unsort_vec[j++], word);
       cont_abs++;
     }
-  }
-  printf("\nCont abs = %d\n",cont_abs); 
+  }*/
+  while ((fscanf (IN, "%m[^"DELIMITER"]%*["DELIMITER"]", &word)) != EOF){
+    //VAMOS IGNORAR PALAVRAS COM SOMENTE UMA LETRA
+    if(strlen(word) > 1){
+      //PASSANDO TUDO PARA LOWER CASE
+      for(i = 0; word[i]; i++) word[i] = tolower(word[i]);
+      
+      //VETOR ---UNSORTED---
+      for (i = 1; i <= cont_abs && i < 0; i++){ 
+        if(strcmp(unsort_vec[i].word, word) == 0){
+          unsort_vec[i].repeticao++;
+          i=-1;
+        }
+      }
+      if (i > cont_abs){
+          strcpy(unsort_vec[cont_abs].word, word);
+          unsort_vec[cont_abs].repeticao++;
+          cont_abs++;
+        }
+      }
+    }
+
+
+
+
+  printf("\nCont abs = %d\n",cont_abs);/* 
   //FUNÇÃO HASH
   for (h = 0; h < cont_abs; h++){
       strcpy(word, unsort_vec[h]);   //COLOCA O VETOR UNSORTED NA STRING WORD
@@ -156,7 +187,7 @@ int main(int argc, char **argv){
         }
       }
     }
-  }
+  }*/
   //FOR SIMPLESMENTE PARA FAZER A IMPRESSÃO DOS DADOS
 	for (i = 0; i < TAM; i++){
 			if (ht[i].repeticao >= 1){
@@ -164,8 +195,8 @@ int main(int argc, char **argv){
                 printf ("%d\n", ht[i].repeticao);
 			}
 		}
-  	for (i = 0; i < 50; i++){
-           printf ("%s\n", unsort_vec[i]);
+  	for (i = 0; i < cont_abs; i++){
+           printf ("%s\n", unsort_vec[i].word);
 	}
     
   //LIMPA A VARIAVEL WORD
