@@ -33,7 +33,7 @@ unsigned int hashFunction(const char* str, unsigned int len){
 int main(int argc, char **argv){
   //DECLARAÇÃO DAS VARIAVEIS A SEREM USADAS
   char *word, unsort_vec[5000][45];  //CORRIGIR ESSA PORRA
-  int i = 0, flag,max,hash = 0, aux = 0, j = 0;
+  int i = 0, flag,max,hash = 0, aux = 0, j = 0,h=0, cont_abs=0;
   hashTable ht[TAM], htaux[TAM];
 
   //ABERTURA DO ARQUIVO TXT
@@ -60,85 +60,63 @@ int main(int argc, char **argv){
   //MAIS ABAIXO TERA A EXPLICAÇÃO DE CADA FUNÇÃO
   
   while ((fscanf (IN, "%m[^"DELIMITER"]%*["DELIMITER"]", &word)) != EOF){
-    
     //VAMOS IGNORAR PALAVRAS COM SOMENTE UMA LETRA
     if(strlen(word) > 1){
       //PASSANDO TUDO PARA LOWER CASE
       for(i = 0; word[i]; i++) word[i] = tolower(word[i]);
-   
       //VETOR ---UNSORTED---
       strcpy(unsort_vec[j++], word);
+      cont_abs++;
+    }
+  }
+  printf("\nCont abs = %d\n",cont_abs); 
+  //FUNÇÃO HASH
+  for (h = 0; h < cont_abs; h++){
+      strcpy(word, unsort_vec[h]);   //COLOCA O VETOR UNSORTED NA STRING WORD
+      
+      printf("\n%s", word);
+      printf("\n%s", unsort_vec[h]);
 
-      //CHAMANDO A FUNÇÃO PARA GERAR A HASH, MANDANDO OS ARGUMENTOS NECESSARIOS E RECEBENDO
-      //O RETORNO NA VARIAVEL HASH
-      hash = hashFunction(word, strlen(word));
+      hash = hashFunction(word, strlen(word));//CHAMANDO A FUNÇÃO PARA GERAR A HASH, MANDANDO OS ARGUMENTOS NECESSARIOS E RECEBENDO O RETORNO NA VARIAVEL HASH
       
-      //AUX: VARIAVEL AUXILIAR PARA NOS AJUDAR MAIS TARDE NO PROGRAMA
-      aux = hash;
-      
-      //SE NO LUGAR ONDE A PALAVRA DEVE SER INSERIDA NÃO TIVER NENHUM INDICE DE REPETIÇÃO
-      //ENTÃO PODEMOS COLOCALA NO MESMO
-      if (ht[hash].repeticao == 0){
+      aux = hash;  ///AUX: VARIAVEL AUXILIAR PARA NOS AJUDAR MAIS TARDE NO PROGRAMA
+    
+      if (ht[hash].repeticao == 0){ //SE NO LUGAR ONDE A PALAVRA DEVE SER INSERIDA NÃO TIVER NENHUM INDICE DE REPETIÇÃO ENTÃO PODEMOS COLOCALA NO MESMO
         strcpy(ht[hash].word, word);
         ht[hash].repeticao ++;
-      
-      //CASO O JA ESTEJA > 0 ENTÃO VAMOS VERIFICAR SE A PALAVRA QUE ESTA LA E A NOVA PALAVRA
-      //SÃO IGUAIS SE FOREM VAMOS SIMPLESMENTE SOMAR MAIS UM NA REPETIÇÃO
-      }else if(strcmp(ht[hash].word,word) == 0){
+            
+     }else if(strcmp(ht[hash].word,word) == 0){ //CASO O JA ESTEJA > 0 ENTÃO VAMOS VERIFICAR SE A PALAVRA QUE ESTA LA E A NOVA PALAVRA SÃO IGUAIS SE FOREM VAMOS SIMPLESMENTE SOMAR MAIS UM NA REPETIÇÃO
         ht[hash].repeticao ++;
-      
-      //CASO NENHUM DOS CASOS ACIMA SEJAM SATISFEITOS DEVEMOS ENTÃO VERIFICAR SE A KEY
-      //(VARIAVEL ESCOLHIDA PARA AVISAR SE JA TEM COLIÇÕES), SE ELA FOR IGUAL A 0 ENTÃO
-      //VAMOS PROCURAR O PROXIMO LUGAR VAZIO EM NOSSA HASH TABLE
-      }else if (ht[hash].key == 0){
+
+      }else if (ht[hash].key == 0){//CASO NENHUM DOS CASOS ACIMA SEJAM SATISFEITOS DEVEMOS ENTÃO VERIFICAR SE A KEY (VARIAVEL ESCOLHIDA PARA AVISAR SE JA TEM COLIÇÕES), SE ELA FOR IGUAL A 0 ENTÃO VAMOS PROCURAR O PROXIMO LUGAR VAZIO EM NOSSA HASH TABLE
         while (ht[hash].repeticao != 0){
           hash ++;
         }
       
-      //QUANDO É ACHADO UM LOCA FAZIO VAMOS INSERIR A PALAVRA NELE
-        strcpy(ht[hash].word, word);
+        strcpy(ht[hash].word, word);//QUANDO É ACHADO UM LOCA FAZIO VAMOS INSERIR A PALAVRA NELE
       
-      //VAMOS SOMAR MAIS UM NA REPETIÇÃO
-        ht[hash].repeticao ++;
+       ht[hash].repeticao ++;//VAMOS SOMAR MAIS UM NA REPETIÇÃO
       
-      //E USAR O AUX (QUE CONTEM O VAOR DA HASH ANTIGA), PARA SOMAR MAIS UM NAS COLISÃO (VARIAVEL KEY)
-      //ASSIM SABEMOS QUE SE CASO HAJA OUTRA PALAVRA COM A MESMA HASH DEVMOS PROCURAR EM TODO O VETOR
-        ht[aux].key ++;
-      
-      //SE JA TIVER COLISÃO VAMOS:
-      }else if(ht[hash].key != 0){
-      
-      //PROCURAR EM TODO O VETOR SE JA EXISTE A PALAVRA NELE
-        for (i = 0;i < TAM; i++){
-      
-          //FUNÇÃO PARA COMPARAÇÃO DE PALAVRAS, CASO SEJA IGUAL A 0 ENTÃO SÃO IGUAIS
-          if (strcmp(ht[i].word,word) == 0){
-      
-            //SE FOR IGUAL SOMA-SE MAIS UM NA REPETIÇÃO
-            ht[i].repeticao ++;
-            //PARAR O FOR
+       ht[aux].key ++;//E USAR O AUX (QUE CONTEM O VAOR DA HASH ANTIGA), PARA SOMAR MAIS UM NAS COLISÃO (VARIAVEL KEY)ASSIM SABEMOS QUE SE CASO HAJA OUTRA PALAVRA COM A MESMA HASH DEVMOS PROCURAR EM TODO O VETOR
+    
+      }else if(ht[hash].key != 0){//SE JA TIVER COLISÃO VAMOS:
+        for (i = 0;i < TAM; i++){   
+          if (strcmp(ht[i].word,word) == 0){ //FUNÇÃO PARA COMPARAÇÃO DE PALAVRAS, CASO SEJA IGUAL A 0 ENTÃO SÃO IGUAIS              
+            ht[i].repeticao ++; //SE FOR IGUAL SOMA-SE MAIS UM NA REPETIÇÃO parar o for
             break;
           }
         }
       
-      //CASO TENHA A MESMA HASH E A HASH ESTEJA COM COLISÃO MAS A PALAVRA SEJA DIFERENTE
-      //ENTÃO VAMOS PROCURAR UM LUGAR ONDE NÃO TENHA COLISÃO
-      }else{
-      
-        //SOMA-SE MAIS UM NA HASH ATE ACHAR UM LUGAR ONDE NÃO TENHA NENHUMA COLISÃO
-        while (ht[hash].key != 0){
+      }else{ //CASO TENHA A MESMA HASH E A HASH ESTEJA COM COLISÃO MAS A PALAVRA SEJA DIFERENTE ENTÃO VAMOS PROCURAR UM LUGAR ONDE NÃO TENHA COLISÃO
+        while (ht[hash].key != 0){ //SOMA-SE MAIS UM NA HASH ATE ACHAR UM LUGAR ONDE NÃO TENHA NENHUMA COLISÃO
           hash ++;
         }
-        
-        //ASSIM QUE ACHAR O LOCAL ONDE NÃO HAJA COLISÃO VAMOS:
-        //COPIAR A PALAVRA PARA DENTRO DA HASH TABLE
-        strcpy(ht[hash].word, word);
-        
-        //SOMAR MAIS UM NO INDICE DE COLISÃO
-        ht[hash].key ++;
+        strcpy(ht[hash].word, word); //ASSIM QUE ACHAR O LOCAL ONDE NÃO HAJA COLISÃO VAMOS: COPIAR A PALAVRA PARA DENTRO DA HASH TABLE
+        ht[hash].key ++; //SOMAR MAIS UM NO INDICE DE COLISÃO
       }
-    }
   }
+
+  
   //METODO DE ORDENAÇÃO
   //Usando o método SELECTIONSORT, e partindo do principio que a HASH indica a posição de armazenamento do contador
   //e de cada	palavra, é necessário que ambos sejam ordenados "juntos", para isso é usada uma variavel auxliar auxC e um vetor aux
