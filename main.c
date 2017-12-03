@@ -28,23 +28,23 @@ void Merge(char* arr[],int low,int mid,int high) //Merging the Array Function
     for(i=0;i<nL;i++)
     {
         L[i]=malloc(sizeof(arr[low+i]));
-        strcpy(L[i],arr[low+i]);
+        L[i]=arr[low+i];
     }
     for(i=0;i<nR;i++)
     {
-        R[i]=malloc(sizeof(arr[mid+i+1]));
-        strcpy(R[i],arr[mid+i+1]);
+        R[i] = malloc(sizeof(arr[mid+i+1]));
+        R[i] = arr[mid+i+1];
     }
     int j=0,k;
     i=0;
     k=low;
     while(i<nL&&j<nR)
     {
-        if(strcmp(L[i],R[j])<0)strcpy(arr[k++],L[i++]);
-        else strcpy(arr[k++],R[j++]);
+        if(strcmp(L[i],R[j])<0) arr[k++]=L[i++];
+        else arr[k++] = R[j++];
     }
-    while(i<nL)strcpy(arr[k++],L[i++]);
-    while(j<nR)strcpy(arr[k++],R[j++]);
+    while(i<nL) arr[k++] = L[i++];
+    while(j<nR) arr[k++] = R[j++];
 
 }
 
