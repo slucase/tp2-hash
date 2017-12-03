@@ -16,9 +16,53 @@ typedef struct{
   int repeticao;
 }hashTable;
 
+//merge sort by ptrs
+void Merge(char* arr[],int low,int mid,int high) //Merging the Array Function
+{
+    int nL= mid-low+1;
+    int nR= high-mid;
 
-//sort by ptrs
-void sortptrs(char *wordptr[], int n){
+    char** L=malloc(sizeof(char *)*nL);
+    char** R=malloc(sizeof(char *)*nR);
+    int i;
+    for(i=0;i<nL;i++)
+    {
+        L[i]=malloc(sizeof(arr[low+i]));
+        strcpy(L[i],arr[low+i]);
+    }
+    for(i=0;i<nR;i++)
+    {
+        R[i]=malloc(sizeof(arr[mid+i+1]));
+        strcpy(R[i],arr[mid+i+1]);
+    }
+    int j=0,k;
+    i=0;
+    k=low;
+    while(i<nL&&j<nR)
+    {
+        if(strcmp(L[i],R[j])<0)strcpy(arr[k++],L[i++]);
+        else strcpy(arr[k++],R[j++]);
+    }
+    while(i<nL)strcpy(arr[k++],L[i++]);
+    while(j<nR)strcpy(arr[k++],R[j++]);
+
+}
+
+
+void MergeSort(char* arr[],int low,int high) //Main MergeSort function
+{
+    if(low<high)
+    {
+        int mid=(low+high)/2;
+        MergeSort(arr,low,mid);
+        MergeSort(arr,mid+1,high);
+        Merge(arr,low,mid,high);
+    }
+}
+
+
+//selection sort by ptrs
+void SelectionSort(char *wordptr[], int n){
     int i, eff_size, maxpos = 0;
     char *auxptr;
 
@@ -96,11 +140,14 @@ int main(int argc, char **argv){
     }
   }
 
-//sort
-  for (i = 0; i <= cont_abs; i++)
+//assgin pointers
+  for (i = 0; i < cont_abs; i++)
       vecptr[i] = unsort_vec[i];
-  sortptrs (vecptr, cont_abs);
 
+  
+  //Sort functions
+  //SelectionSort(vecptr, cont_abs);
+  MergeSort(vecptr, 0, cont_abs-1); //Main MergeSort function
 
 
 //printa
