@@ -57,7 +57,7 @@ int main(int argc, char **argv){
       unsort_vec[i].key = 0;
       unsort_vec[i].repeticao = 0;
   }
-*/
+
 //POR CUIDADOS VAMOS ZERAR O BUFFER TAMBEM
   fflush(stdout);
 
@@ -81,7 +81,7 @@ int main(int argc, char **argv){
       } 
     }
   }
-
+*/
 //assgin pointers
   for (i = 0; i < cont_abs; i++)
       vecptr[i] = unsort_vec[i];
@@ -89,7 +89,7 @@ int main(int argc, char **argv){
   
   //Sort functions
   //SelectionSort(unsort_vec, cont_abs);
-  MergeSort(vecptr, 0, cont_abs-1); //Main MergeSort function
+ // MergeSort(vecptr, 0, cont_abs-1); //Main MergeSort function
 
 
 //printa
@@ -101,7 +101,7 @@ int main(int argc, char **argv){
    
 
 
-//  genHashTable (IN);
+  genHashTable (IN);
   
   //LIMPA A VARIAVEL WORD
   free(word);
