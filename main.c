@@ -7,22 +7,23 @@
 #include <ctype.h>
 
 #define DELIMITER "!? .,-\n"
-#define TAM 256
+#define TAM 5000
+#define MAXW 5000
 
 //STRUCK PARA GERAÇÃO DA HASH TABLE
 typedef struct hTable{
   int key;
-  char word [46]; //Para caber até a maior palavra da língua portuguesa: "pneumoultramicroscopicossilicovulcanoconiótico"
+  char word[45]; //Para caber até a maior palavra da língua portuguesa: "pneumoultramicroscopicossilicovulcanoconiótico"
   int reps;
 }hashTable;
 
 
-void  SelectionSort2(hashTable *wordptr[], int n);
+//void  SelectionSort2(hashTable *wordptr[], int n);
 
 void SelectionSort (char *wordptr[], int n);
 void MergeSort (char* arr[],int low,int high); //Main MergeSort function
 void Merge (char* arr[],int low,int mid,int high); //Merging the Array Function
-void genHashTable (FILE *IN);
+void genHashTable (char unsort_vec[MAXW][46], int n);
 unsigned int hashFunction(const char* str, unsigned int len);
     
 int main(int argc, char **argv){
@@ -56,11 +57,6 @@ int main(int argc, char **argv){
   for (i = 0; i < 5001; i++){
     reps[i] = 0;
   }
-/*  for (i = 0; i < 5000; i++){
-      unsort_vec[i].key = 0;
-      unsort_vec[i].repeticao = 0;
-  }
-
 //POR CUIDADOS VAMOS ZERAR O BUFFER TAMBEM
   fflush(stdout);
 
@@ -68,20 +64,11 @@ int main(int argc, char **argv){
     //VAMOS IGNORAR PALAVRAS COM SOMENTE UMA LETRA
     if(strlen(word) > 1){
       //PASSANDO TUDO PARA LOWER CASE
-      for(i = 0; word[i]; i++) word[i] = tolower(word[i]);
-      
+      for(i = 0; word[i]; i++) 
+          word[i] = tolower(word[i]);
       //VETOR ---UNSORTED---
-      for (i = 1; i <= cont_abs && i > 0; i++){ 
-        if(strcmp(unsort_vec[i], word) == 0){
-          reps[i]++;
-          i=-1;
-        }
-      }
-      if(i > 0){
-        strcpy(unsort_vec[cont_abs], word);
-        reps[cont_abs]++;
-        cont_abs++;
-      } 
+      strcpy(unsort_vec[cont_abs], word);
+      cont_abs++;
     }
   }
 
@@ -95,16 +82,16 @@ int main(int argc, char **argv){
  // MergeSort(vecptr, 0, cont_abs-1); //Main MergeSort function
 
 
-//printa
+/*printa
   printf("\nCont abs = %d\n",cont_abs);
   	for (i = 0; i < cont_abs; i++){
         j=((vecptr[i]-unsort_vec[0])/sizeof(unsort_vec[0]));
         printf ("%s %d\n",vecptr[i], reps[j]);
 	}
- */ 
+  */
 
 
-  genHashTable (IN);
+  genHashTable (unsort_vec, cont_abs);
   
   //LIMPA A VARIAVEL WORD
   free(word);
@@ -155,7 +142,7 @@ void MergeSort(char* arr[],int low,int high) //Main MergeSort function
     }
 }
 
-void SelectionSort(char *wordptr[], int n){
+void SelectionSort(char* wordptr[], int n){
     int i, eff_size, maxpos = 0;
     char *auxptr;
 
@@ -172,59 +159,63 @@ void SelectionSort(char *wordptr[], int n){
     }
 }
 
-void genHashTable (FILE *IN){
+void genHashTable (char unsort_vec[MAXW][46], int n){
 
-  char *word; //CORRIGIR ESSA PORRA
+  char 
+      *word, *vecptr[MAXW]; //RETIRAR ESSA PORRA
 
   word = malloc(46*sizeof(char));
  
-  hashTable ht[5000], htaux[5000] /*  unsort_vec[5000], a_aux[1] */;
+  
+  char words[5000][46];
+  hashTable ht[5000], htaux[5000];
 
   int
-      i, hash = 0, aux = 0, j = 0, cont_abs = 0; 
+      i, hash = 0, aux = 0, j = 0, cont_abs, reps[5000], key[5000]; 
 
   for (i = 0; i < 5000; i++){
-    ht[i].reps = 0;
-    ht[i].key = 0;
+    reps[i] = 0;
+    key[i] = 0;
   }
 
-  while ((fscanf (IN, "%m[^"DELIMITER"]%*["DELIMITER"]", &word)) != EOF){
-    if(strlen(word) > 1){
-      for(i = 0; word[i]; i++) word[i] = tolower(word[i]);
+  cont_abs = n;
+
+  for (i = 0; i < n; i++){
+      strcpy(word, unsort_vec[i]);
+      
       hash = hashFunction(word, strlen(word));
       aux = hash;
-      if (ht[hash].reps == 0){
-        strcpy(ht[hash].word, word);
-        ht[hash].reps ++;
-        cont_abs++;
-      }else if(strcmp(ht[hash].word,word) == 0){
-        ht[hash].reps++;
-      }else if (ht[hash].key == 0){
-        while (ht[hash].reps != 0){
-          hash ++;
+      if (reps[hash] == 0){
+        strcpy(words[hash], word);
+        reps[hash]++;
+      }else if(strcmp(words[hash], word) == 0){
+        reps[hash]++;
+        cont_abs--;
+      }else if (key[hash] == 0){
+        while (reps[hash] != 0){
+          hash++;
         }
-        strcpy(ht[hash].word, word);
-        ht[hash].reps ++;
-        ht[aux].key ++;
-        cont_abs++;
-      }else if(ht[hash].key != 0){
+        strcpy(words[hash], word);
+        reps[hash] ++;
+        key[hash]++;
+      }else if(key[hash] != 0){
         for (i = 0;i < 5000; i++){
-          if (strcmp(ht[i].word,word) == 0){
-            ht[i].reps ++;
+          if (strcmp(words[i], word) == 0){
+            reps[i]++;
+            cont_abs--;
             break;
           }
         }
       }else{
-        while (ht[hash].key != 0){
-          hash ++;
+        while (key[hash] != 0){
+          hash++;
         }
-        strcpy(ht[hash].word, word);
-        ht[hash].key ++;
-        cont_abs++;
+        strcpy(words[hash], word);
+        key[hash]++;
       }
     }
-  }
- 
+  
+ /*  
   hashTable *vecptr[1];
 
   for (i = 0; i < 5000; i++, j=1){
@@ -234,36 +225,23 @@ void genHashTable (FILE *IN){
           j++;
       }
   }
-  
-  SelectionSort2(vecptr, 5000);
+  */
+ // SelectionSort2(vecptr, 5000);
  
   printf ("contabs = %d \n", cont_abs);
   
-  for (i = 0; i < cont_abs; i++){
-  			if (vecptr[i]->reps > 0){
-              printf ("%d ", vecptr[i]->reps);
-	    	  printf ("%s\n", vecptr[i]->word);
-			}
+  for (i = 0; i < MAXW; i++){
+  			if (reps[i] > 0)
+                vecptr[j++] = words[i]; 
   }
-}
 
-void SelectionSort2(hashTable *wordptr[5000], int n){
-    int i, eff_size, maxpos = 0;
-    hashTable *auxptr;
+ SelectionSort(vecptr, cont_abs);
+ //MergeSort(vecptr, 0, cont_abs-1); //Main MergeSort function
 
-    for (eff_size = n; eff_size > 1; eff_size--){
-        if (wordptr[eff_size]->reps > 0){
-        for (i = 0; i < eff_size; i++){
-
-            if (strcmp(wordptr[i]->word, wordptr[maxpos]->word) > 0)
-                maxpos = i;
-
-        }
-        auxptr = wordptr[maxpos];
-        wordptr[maxpos] = wordptr[eff_size-1];
-        wordptr[eff_size-1] = auxptr;
-    }
-    }
+  for (i = 0; i < cont_abs; i++){
+            printf(" %s\n", vecptr[i]); 
+  }
+  free(word);
 }
 
 unsigned int hashFunction(const char* str, unsigned int len){
@@ -276,3 +254,53 @@ unsigned int hashFunction(const char* str, unsigned int len){
   }
   return hash%TAM;
 }
+
+
+
+/*  for (i = 0; i < 5000; i++){
+      unsort_vec[i].key = 0;
+      unsort_vec[i].repeticao = 0;
+  }
+
+//POR CUIDADOS VAMOS ZERAR O BUFFER TAMBEM
+  fflush(stdout);
+
+  while ((fscanf (IN, "%m[^"DELIMITER"]%*["DELIMITER"]", &word)) != EOF){
+    //VAMOS IGNORAR PALAVRAS COM SOMENTE UMA LETRA
+    if(strlen(word) > 1){
+      //PASSANDO TUDO PARA LOWER CASE
+      for(i = 0; word[i]; i++) word[i] = tolower(word[i]);
+      
+      //VETOR ---UNSORTED---
+      for (i = 1; i <= cont_abs && i > 0; i++){ 
+        if(strcmp(unsort_vec[i], word) == 0){
+          reps[i]++;
+          i=-1;
+        }
+      }
+      if(i > 0){
+        strcpy(unsort_vec[cont_abs], word);
+        reps[cont_abs]++;
+        cont_abs++;
+      } 
+    }
+  }
+
+//assgin pointers
+  for (i = 0; i < cont_abs; i++)
+      vecptr[i] = unsort_vec[i];
+
+  
+  //Sort functions
+  //SelectionSort(unsort_vec, cont_abs);
+ // MergeSort(vecptr, 0, cont_abs-1); //Main MergeSort function
+
+
+//printa
+  printf("\nCont abs = %d\n",cont_abs);
+  	for (i = 0; i < cont_abs; i++){
+        j=((vecptr[i]-unsort_vec[0])/sizeof(unsort_vec[0]));
+        printf ("%s %d\n",vecptr[i], reps[j]);
+	}
+ */ 
+
