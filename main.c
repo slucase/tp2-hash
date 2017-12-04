@@ -16,6 +16,9 @@ typedef struct hTable{
   int reps;
 }hashTable;
 
+
+void  SelectionSort2(hashTable *wordptr[], int n);
+
 void SelectionSort (char *wordptr[], int n);
 void MergeSort (char* arr[],int low,int high); //Main MergeSort function
 void Merge (char* arr[],int low,int mid,int high); //Merging the Array Function
@@ -81,7 +84,7 @@ int main(int argc, char **argv){
       } 
     }
   }
-*/
+
 //assgin pointers
   for (i = 0; i < cont_abs; i++)
       vecptr[i] = unsort_vec[i];
@@ -98,7 +101,7 @@ int main(int argc, char **argv){
         j=((vecptr[i]-unsort_vec[0])/sizeof(unsort_vec[0]));
         printf ("%s %d\n",vecptr[i], reps[j]);
 	}
-   
+ */ 
 
 
   genHashTable (IN);
@@ -175,12 +178,12 @@ void genHashTable (FILE *IN){
 
   word = malloc(46*sizeof(char));
  
-  hashTable ht[TAM], htaux[TAM] /*  unsort_vec[5000], a_aux[1] */;
+  hashTable ht[5000], htaux[5000] /*  unsort_vec[5000], a_aux[1] */;
 
   int
-      i, hash = 0, aux = 0, j = 0; 
+      i, hash = 0, aux = 0, j = 0, cont_abs = 0; 
 
-  for (i = 0; i < TAM; i++){
+  for (i = 0; i < 5000; i++){
     ht[i].reps = 0;
     ht[i].key = 0;
   }
@@ -193,8 +196,9 @@ void genHashTable (FILE *IN){
       if (ht[hash].reps == 0){
         strcpy(ht[hash].word, word);
         ht[hash].reps ++;
+        cont_abs++;
       }else if(strcmp(ht[hash].word,word) == 0){
-        ht[hash].reps ++;
+        ht[hash].reps++;
       }else if (ht[hash].key == 0){
         while (ht[hash].reps != 0){
           hash ++;
@@ -202,8 +206,9 @@ void genHashTable (FILE *IN){
         strcpy(ht[hash].word, word);
         ht[hash].reps ++;
         ht[aux].key ++;
+        cont_abs++;
       }else if(ht[hash].key != 0){
-        for (i = 0;i < TAM; i++){
+        for (i = 0;i < 5000; i++){
           if (strcmp(ht[i].word,word) == 0){
             ht[i].reps ++;
             break;
@@ -215,15 +220,50 @@ void genHashTable (FILE *IN){
         }
         strcpy(ht[hash].word, word);
         ht[hash].key ++;
+        cont_abs++;
       }
     }
   }
-  for (i = 0; i < TAM; i++){
-  			if (ht[i].reps >= 1){
-              printf ("%d ", ht[i].reps);
-	    	  printf ("%s\n", ht[i].word);
+ 
+  hashTable *vecptr[1];
+
+  for (i = 0; i < 5000; i++, j=1){
+      if(ht[i].reps>0){
+          vecptr[j-1] = realloc(vecptr, (j*(sizeof(hashTable))));
+          vecptr[j-1] = &ht[i];
+          j++;
+      }
+  }
+  
+  SelectionSort2(vecptr, 5000);
+ 
+  printf ("contabs = %d \n", cont_abs);
+  
+  for (i = 0; i < cont_abs; i++){
+  			if (vecptr[i]->reps > 0){
+              printf ("%d ", vecptr[i]->reps);
+	    	  printf ("%s\n", vecptr[i]->word);
 			}
   }
+}
+
+void SelectionSort2(hashTable *wordptr[5000], int n){
+    int i, eff_size, maxpos = 0;
+    hashTable *auxptr;
+
+    for (eff_size = n; eff_size > 1; eff_size--){
+        if (wordptr[eff_size]->reps > 0){
+        for (i = 0; i < eff_size; i++){
+
+            if (strcmp(wordptr[i]->word, wordptr[maxpos]->word) > 0)
+                maxpos = i;
+
+        }
+        auxptr = wordptr[maxpos];
+        wordptr[maxpos] = wordptr[eff_size-1];
+        wordptr[eff_size-1] = auxptr;
+    }
+    }
 }
 
 unsigned int hashFunction(const char* str, unsigned int len){
